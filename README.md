@@ -403,4 +403,21 @@ pip install numpy scipy matplotlib sympy mpmath
 - V. Kokoouline et al., *J. Chem. Phys.* **110**, 9865 (1999) — mapped Fourier grid
 - K. Willner, O. Dulieu & F. Masnou-Seeuws, *J. Chem. Phys.* **120**, 548 (2004) — symmetric mapped kinetic form
 - D. T. Colbert & W. H. Miller, *J. Chem. Phys.* **96**, 1982 (1992) — sinc-DVR (general DVR reference)
-```
+
+---
+
+## 12. License & citation
+
+This project is released under the **MIT License** (see `LICENSE`) — free to use,
+modify, and redistribute, provided the copyright notice is retained.
+
+**If you use this code in scientific work, please cite it.** GitHub's "Cite this
+repository" button reads the machine-readable `CITATION.cff`; the human-readable
+form is:
+
+> A. Meyroneinc, *Sr87 adiabatic curves and bound-state pipeline for
+> photoassociation*, 2026. https://github.com/halebanc/sr87-photoassociation
+
+Please also cite the underlying physics references in §11 as appropriate (in
+particular Borkowski 2014 for the potentials and Kokoouline 1999 / Willner 2004
+for the mapped-grid method).

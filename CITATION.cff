@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+title: "Sr87 adiabatic curves and bound-state pipeline for photoassociation"
+message: >-
+  If you use this software in scientific work, please cite it using the
+  metadata below.
+type: software
+authors:
+  - family-names: Meyroneinc
+    given-names: Alban
+    alias: halebanc
+repository-code: "https://github.com/halebanc/sr87-photoassociation"
+abstract: >-
+  Computes the adiabatic potential curves of the 87Sr2 dimer (coupled
+  hyperfine + fine-structure Hamiltonian) and the vibrational bound-state
+  energies of each curve via two independent methods — the mapped Fourier
+  grid method (DVR) and Bohr-Sommerfeld (WKB) quantization — together with
+  photoassociation linewidths from bound-bound Franck-Condon factors.
+keywords:
+  - photoassociation
+  - ultracold strontium
+  - Sr87
+  - molecular potentials
+  - DVR
+  - mapped Fourier grid
+  - WKB
+  - Franck-Condon factors
+license: MIT
+year: 2026
