@@ -5,6 +5,29 @@ This is the expensive one-time setup step.  It computes three lists of
 quantum-number tuples (ε, γ, π) and two coupling matrices (εγ, επ) using
 exact symbolic arithmetic (sympy CG / Wigner 6j).
 
+References
+----------
+[1] I. Reichenbach, PhD thesis, University of New Mexico (2009),
+    "Optical control and quantum information processing with ultracold
+    alkaline-earth-like atoms", https://digitalrepository.unm.edu/phyc_etds/57/
+    Defines the three channel bases used here (Sec. 4.2.3, pp. 76-79):
+      |ε⟩ = |(f1 f2)F R; T mT p⟩    extended Hund's case (e) — hyperfine diagonal
+      |γ⟩ = |J Ω I ι Φ; T mT p⟩     extended Hund's case (c) — BO potentials diagonal
+      |π⟩ = |f1 mf1, i2 mi2, R mR⟩  uncoupled product basis  — dipole & Zeeman
+    _gamma_epsilon implements ⟨γ|ε⟩, Eq. (4.26) p. 79 (derivation: Sec. 2.3,
+    Eqs. 2.51-2.53), including the phase (-1)^(j1+i1+i2+F) = (-1)^F for Sr87.
+    _epsilon_pi implements ⟨ε|π⟩, Eq. (4.20) p. 78; the symmetrization factor
+    Ξ = 1 because the two atoms are in different electronic states (¹S₀ + ³P₁).
+    Cross-check: with i1 = i2 = 1/2 the ε loop reproduces the 5 channels of
+    Table 4.1 (¹⁷¹Yb, s-wave) exactly.
+
+[2] J. H. Han, J. H. Kang, M. Lee, Y. Shin, Phys. Rev. A 97, 013401 (2018),
+    arXiv:1710.03072 — same multichannel model applied to ¹⁷³Yb (i = 5/2).
+    Provides the s-wave PA selection rules encoded in the ε loop: ground state
+    T = F = I even, p = +1  ⇒  excited states T = 1 … 2i, R even, p = -1.
+    Cross-check: with i1 = i2 = 5/2 the ε loop reproduces their 205 channels
+    (Fig. 2) exactly.  Both checks validate the quantum-number ranges below.
+
 Output
 ------
 precomputed_cg_tables.npz
@@ -45,7 +68,7 @@ def _gamma_epsilon(f1, F, R, T, mT, Ω, i, ℓ, Tp, mTp, Φ):
     cg2   = CG(J, Ω, i, ℓ, F, Φ)
     w6j   = Wigner6j(j1, i1, f1, i2, F, i)
     kron  = (1 if T == Tp else 0) * (1 if mT == mTp else 0)
-    coeff = np.sqrt((2*i + 1) * (2*f1 + 1) * (2*R + 1) / (2*T + 1)) * (-1)
+    coeff = np.sqrt((2*i + 1) * (2*f1 + 1) * (2*R + 1) / (2*T + 1)) * (-1)**int(j1 + i1 + i2 + F)
     return float(cg1.doit() * cg2.doit() * w6j.doit() * kron * coeff)
 
 
@@ -103,7 +126,7 @@ def build_tables(force_rebuild: bool = False):
     for f1_a in np.arange(abs(i1 - J), i1 + J + 1):
         for mf1_a in np.arange(-f1_a, f1_a + 1):
             for mi2_a in np.arange(-i1, i1 + 1):
-                for R_a in np.arange(0, i1 + J + 1, 2):
+                for R_a in np.arange(0, 2*(2*i1 + J) + 1, 2):
                     for mR_a in np.arange(-R_a, R_a + 1):
                         pi.append([float(f1_a), float(mf1_a), float(mi2_a),
                                    float(R_a),  float(mR_a)])
