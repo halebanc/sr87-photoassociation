@@ -2,6 +2,12 @@
 npz_data/
 *.npz
 
+# Private companion scripts (kept out of the public repo; see
+# sr87-photoassociation-private and README §3.4)
+compute_binding_energies.py
+compute_binding_energies_wkb.py
+compute_pa_linewidths.py
+
 # Figures / outputs
 *.png
 *.pdf
