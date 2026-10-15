@@ -201,3 +201,26 @@ form is:
 Please also cite the underlying physics references in §6 as appropriate (in
 particular Borkowski 2014 for the potentials and Kokoouline 1999 / Willner 2004
 for the mapped-grid method).
+
+---
+
+## 8. Provenance and tooling
+
+**This code was written with the assistance of a large language model**
+(Claude), by a single author. It is stated here because readers are entitled to
+know how a scientific tool was produced before relying on it.
+
+What that does and does not mean:
+
+- The **physics is not new**. The potentials of `molecular_potentials.py` are
+  the fitted parameters published in Borkowski *et al.*, PRA **90**, 032713
+  (2014); the mapped-grid method is Kokoouline 1999 / Willner 2004. This
+  repository is an implementation of published work, not a new result.
+- The **warrant is the cross-check, not the authorship**. DVR and WKB are two
+  methods of different nature applied to the same interpolated potential
+  (§1): they are run independently and compared. A transcription error in
+  either one shows up as a disagreement between them.
+- **Verify before relying on it.** The checks are reproducible by anyone, and
+  that is the intended basis for trust. Nothing here has been peer-reviewed.
+
+Reviewed and published by the author, who is responsible for its content.
