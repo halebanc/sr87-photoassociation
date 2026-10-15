@@ -32,7 +32,13 @@ hbar    = 1.05457e-34
 Joule   = 6.24151e18 * 2.41799e14 / (1e6 * 1e3)
 a0      = 5.29177e-11
 
-A, B = -0.2600845, -0.35659
+# B(3P1) de 87Sr = -35.658 MHz  =>  -0.035659 GHz  (et non -0.35659)
+# Verification : intervalles hyperfins mesures  F'=9/2 - F'=11/2 = 1463.15(2) MHz
+#                et F'=7/2 - F'=11/2 = 2593.41(2) MHz
+#                [Ferrari et al., arXiv:physics/0410108, Table III]
+#   avec B = -0.35659  ->  1757.3 et 2526.6 MHz   (faux de +294 et -67 MHz)
+#   avec B = -0.035659 ->  1463.2 et 2593.4 MHz   (exact)
+A, B = -0.2600845, -0.035659
 mu   = 86.90888 / 2 * amu
 J, j1, i1, i2, p = 1, 1, 9/2, 9/2, -1
 
@@ -68,13 +74,34 @@ def _ij(a):
     return 0.5 * (f*(f+1) - i1*(i1+1) - j1*(j1+1))
 
 
-_diag = np.array(
+# l'offset doit annuler E(F'=11/2), qui depend de B : il passe de
+# 1.259528 GHz (valeur calee sur le B errone) a 1.179295 GHz.
+# Plus robuste : le calculer au lieu de le coder en dur.
+_hf = np.array(
     [A * _ij(a)
      + B * (3*_ij(a)**2 + 1.5*_ij(a) - i1*(i1+1)*j1*(j1+1))
        / (2*i1*j1*(2*i1-1)*(2*j1-1))
-     + 1.259528
      for a in range(N_eps)],
-    dtype=np.float64)  # 1.259528 GHz offset sets correct asymptotes
+    dtype=np.float64)
+_diag = _hf - _hf[εlist[:, 0] == 5.5][0]   # asymptote F'=11/2 a zero
+
+# ---- terme centrifuge : ABSENT du Hamiltonien jusqu'ici ----
+# H doit contenir hbar^2 R(R+1) / (2 mu r^2).  A r = 75 a0 cela vaut
+# 7.38 MHz x R(R+1), soit +44 MHz pour R=2, +310 MHz pour R=6,
+# +2.5 GHz pour R=18.  Sans ce terme rien ne penalise les grands R :
+# l'amplitude du canal d'entree (R=0) se dilue sur les 375 courbes de
+# l'asymptote basse au lieu de se concentrer sur ~90, et aucune raie
+# calculee n'atteint le dixieme de la force observee.
+#
+# R est un bon nombre quantique de la base epsilon |(f1 f2)F R; T mT>,
+# donc R^2 y est rigoureusement diagonal (valeur propre R(R+1)) et il n'y
+# a aucun terme de Coriolis hors diagonale a ajouter.
+#
+# Attention en aval : les courbes portent desormais la barriere
+# centrifuge.  compute_binding_energies.solve_single_channel ne doit donc
+# PAS ajouter un l(l+1) de son cote, sous peine de double comptage.
+_Rrot = εlist[:, 2]                         # nombre rotationnel R de chaque canal
+_CENT = (hbar**2 / (2 * mu * a0**2) * Joule) * _Rrot * (_Rrot + 1)   # GHz * a0^2
 
 _E     = np.asarray(εγtable, dtype=np.float64)
 _Ω_arr = γlist[:, 0].astype(int)
@@ -94,7 +121,7 @@ def _build_H(r):
                       for g in range(M_gamma)])
     H_pot  = (_E * Vvals[None, :]) @ _E.T
     H_pot *= _mask
-    return csr_matrix(np.diag(_diag) + H_pot)
+    return csr_matrix(np.diag(_diag + _CENT / r**2) + H_pot)
 
 
 # ── diagonalisation ───────────────────────────────────────────────────────────
